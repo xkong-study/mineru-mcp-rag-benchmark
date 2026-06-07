@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mineru": {
+      "command": "uvx",
+      "args": [
+        "mineru-open-mcp"
+      ],
+      "env": {
+        "OUTPUT_DIR": "/Users/kongxiangrui/mineru-mcp-private-doc-qa/outputs"
+      }
+    }
+  }
+}

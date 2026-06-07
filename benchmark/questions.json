@@ -1,0 +1,19 @@
+[
+  {
+    "id": "summary",
+    "question": "What is the purpose of the project?"
+  },
+  {
+    "id": "risks",
+    "question": "What are the main risks in the document?"
+  },
+  {
+    "id": "mode",
+    "question": "When should the team switch from Flash mode to token or Precision mode?"
+  },
+  {
+    "id": "rag",
+    "question": "Why does the prototype avoid building a separate RAG knowledge base?"
+  }
+]
+

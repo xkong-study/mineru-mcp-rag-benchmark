@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+.env
+outputs/
+tmp/
+*.log
+data/rag_index/*.json
+reports/*.json
+reports/*.csv
