@@ -153,6 +153,16 @@ It shows how to:
 - separate orchestration logic from indexing logic
 - present a cleaner resume-ready AI project than a plain vector search demo
 
+## New Joiner Knowledge Hub
+
+The repository now also includes a browser-based onboarding knowledge hub under `new_joiner_hub/`.
+
+It shows how to:
+
+- route new joiner questions across onboarding, product, engineering, security, support, and people/process docs
+- present knowledge lookup in a simple local UI
+- keep the routing logic in LangGraph while keeping retrieval local
+
 ## References
 
 - MinerU ecosystem: https://mineru.net/ecosystem
