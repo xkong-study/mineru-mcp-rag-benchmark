@@ -142,9 +142,19 @@ Personal project and technical write-up | 2026
 - Built a Claude Desktop workflow using MinerU Open MCP Server to parse private PDFs, Word documents, and PowerPoint files directly for on-demand document Q&A.
 - Implemented a local RAG benchmark over MinerU-parsed Markdown to compare on-demand MCP parsing with indexed retrieval across setup cost, latency, repeated-query performance, sandboxed file paths, and privacy tradeoffs.
 
+## LangChain Orchestration Add-On
+
+The repository now also includes a LangChain-based document orchestration demo under `langchain_orchestrator/`.
+
+It shows how to:
+
+- route questions into `qa`, `summarize`, `compare`, and `extract` flows
+- keep retrieval local while adding an optional LangChain synthesis layer
+- separate orchestration logic from indexing logic
+- present a cleaner resume-ready AI project than a plain vector search demo
+
 ## References
 
 - MinerU ecosystem: https://mineru.net/ecosystem
 - MinerU Open MCP registry summary: https://mcp.so/server/mineru-open-mcp/OpenDataLab
 - MinerU Ecosystem GitHub: https://github.com/opendatalab/MinerU-Ecosystem
-
