@@ -9,9 +9,11 @@
 
 ## Deployment and verification
 
+- To release a feature safely, keep the change small, verify the target environment, and check the expected user-facing state before and after launch.
 - Verify the target environment before launch.
 - Check logs and telemetry after rollout.
 - If a change touches user-facing state, validate the edge cases.
+- Record rollback notes when the change affects production behavior.
 
 ## What new joiners should learn first
 
@@ -25,4 +27,3 @@
 - How do I release a feature safely?
 - Where are engineering runbooks stored?
 - What is the rollback process?
-

@@ -173,11 +173,24 @@ def score_chunks(question: str, chunks: list[Chunk]) -> list[tuple[float, Chunk]
 
 
 def search(question: str, chunks: list[Chunk], top_k: int = 3) -> list[dict[str, object]]:
-    selected = [(score, chunk) for score, chunk in score_chunks(question, chunks)[:top_k] if score > 0]
+    scored = score_chunks(question, chunks)
+    selected = [(score, chunk) for score, chunk in scored[:top_k] if score > 0]
+    if len(selected) > 1:
+        filtered = [
+            (score, chunk)
+            for score, chunk in selected
+            if chunk.heading.casefold() not in {"useful questions", "questions that belong here", "good questions to ask"}
+        ]
+        selected = filtered or selected
+    if len(selected) > 1:
+        best_score = selected[0][0]
+        selected = [(score, chunk) for score, chunk in selected if score >= best_score * 0.75]
     results: list[dict[str, object]] = []
     for score, chunk in selected:
         lines = [line.strip() for line in chunk.text.splitlines() if line.strip()]
-        body = " ".join(lines[1:]) if len(lines) > 1 else chunk.text
+        body = " ".join(lines[1:]) if len(lines) > 1 else ""
+        if not body:
+            continue
         results.append(
             {
                 "source": chunk.source,
@@ -193,4 +206,3 @@ def search(question: str, chunks: list[Chunk], top_k: int = 3) -> list[dict[str,
 def extract_sentences(text: str, max_sentences: int = 4) -> list[str]:
     sentences = [part.strip() for part in SENTENCE_SPLIT_RE.split(text) if part.strip()]
     return sentences[:max_sentences]
-

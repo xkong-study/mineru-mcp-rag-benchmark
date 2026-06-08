@@ -6,7 +6,6 @@ import argparse
 import html
 import json
 import os
-import subprocess
 import webbrowser
 from dataclasses import asdict, dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -163,6 +162,10 @@ def route_node(state: HubState) -> dict[str, Any]:
     return {"route": route, "routing_reason": reason}
 
 
+def route_selector(state: HubState) -> str:
+    return state.get("route", "qa")
+
+
 def retrieve_node(state: HubState) -> dict[str, Any]:
     question = state["question"]
     category = state.get("category", "all")
@@ -196,6 +199,8 @@ def _build_answer(route: str, evidence: list[dict[str, object]], question: str) 
         return "\n".join(bullets)
 
     if route == "extract":
+        if len(evidence) == 1:
+            return str(evidence[0].get("snippet", ""))
         items = []
         for index, item in enumerate(evidence[:5], start=1):
             snippet = str(item.get("snippet", ""))
@@ -256,7 +261,7 @@ def build_graph():
     graph.add_edge("route", "retrieve")
     graph.add_conditional_edges(
         "retrieve",
-        lambda state: state["route"],
+        route_selector,
         {
             "qa": "answer_qa",
             "summarize": "answer_summarize",
@@ -290,6 +295,12 @@ def run_query(question: str, category: str = "all", route_mode: str = "auto", to
         answer, synthesis = maybe_synthesize(question, str(result.get("route", "qa")), list(result.get("evidence", [])), answer)
     result["answer"] = answer
     result["synthesis"] = synthesis
+    result["agent_steps"] = [
+        "route",
+        "retrieve",
+        f"answer_{result.get('route', 'qa')}",
+        "optional_llm_synthesis" if use_llm else "extractive_fallback",
+    ]
     result["catalog"] = [asdict(item) for item in CATALOG]
     return result
 
@@ -886,20 +897,40 @@ def serve(host: str, port: int) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="New joiner knowledge hub")
-    parser.add_argument("--host", default=DEFAULT_HOST)
-    parser.add_argument("--port", type=int, default=DEFAULT_PORT)
-    parser.add_argument("--open", action="store_true", help="Open the UI in the default browser")
+    subparsers = parser.add_subparsers(dest="command")
+
+    serve_parser = subparsers.add_parser("serve", help="Run the local browser UI")
+    serve_parser.add_argument("--host", default=DEFAULT_HOST)
+    serve_parser.add_argument("--port", type=int, default=DEFAULT_PORT)
+    serve_parser.add_argument("--open", action="store_true", help="Open the UI in the default browser")
+
+    ask_parser = subparsers.add_parser("ask", help="Run one agent query and print JSON")
+    ask_parser.add_argument("question")
+    ask_parser.add_argument("--category", default="all", choices=sorted(CATEGORY_LABELS))
+    ask_parser.add_argument("--route", default="auto", choices=["auto", "qa", "summarize", "compare", "extract"])
+    ask_parser.add_argument("--top-k", type=int, default=4)
+    ask_parser.add_argument("--use-llm", action="store_true")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    if args.open:
+    if args.command == "ask":
+        result = run_query(
+            question=args.question,
+            category=args.category,
+            route_mode=args.route,
+            top_k=args.top_k,
+            use_llm=args.use_llm,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+
+    if getattr(args, "open", False):
         webbrowser.open_new(f"http://{args.host}:{args.port}")
-    serve(args.host, args.port)
+    serve(getattr(args, "host", DEFAULT_HOST), getattr(args, "port", DEFAULT_PORT))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

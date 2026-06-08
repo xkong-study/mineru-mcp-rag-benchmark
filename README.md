@@ -155,13 +155,27 @@ It shows how to:
 
 ## New Joiner Knowledge Hub
 
-The repository now also includes a browser-based onboarding knowledge hub under `new_joiner_hub/`.
+The repository also includes a LangGraph onboarding knowledge agent under `new_joiner_hub/`.
 
 It shows how to:
 
-- route new joiner questions across onboarding, product, engineering, security, support, and people/process docs
-- present knowledge lookup in a simple local UI
-- keep the routing logic in LangGraph while keeping retrieval local
+- route new joiner questions into `qa`, `summarize`, `compare`, or `extract`
+- retrieve category-filtered Markdown evidence across onboarding, product, engineering, security, support, and people/process docs
+- return deterministic evidence-backed answers without an API key
+- optionally add LLM synthesis when `OPENAI_API_KEY` is available
+- present the workflow in a local browser UI and a CLI query path
+
+Run a CLI query:
+
+```bash
+python3 -m new_joiner_hub ask "How do I release a feature safely?"
+```
+
+Run the UI:
+
+```bash
+python3 -m new_joiner_hub serve --open
+```
 
 ## References
 
